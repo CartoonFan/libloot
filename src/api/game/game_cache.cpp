@@ -36,8 +36,7 @@ using std::string;
 namespace loot {
 GameCache::GameCache() {}
 
-GameCache::GameCache(const GameCache& cache) :
-    plugins_(cache.plugins_) {}
+GameCache::GameCache(const GameCache& cache) : plugins_(cache.plugins_) {}
 
 GameCache& GameCache::operator=(const GameCache& cache) {
   if (&cache != this) {
@@ -47,15 +46,11 @@ GameCache& GameCache::operator=(const GameCache& cache) {
   return *this;
 }
 
-std::set<std::shared_ptr<const Plugin>> GameCache::GetPlugins() const {
-  std::set<std::shared_ptr<const Plugin>> output;
+std::vector<std::shared_ptr<const Plugin>> GameCache::GetPlugins() const {
+  std::vector<std::shared_ptr<const Plugin>> output(plugins_.size());
   std::transform(
-      begin(plugins_),
-      end(plugins_),
-      std::inserter<std::set<std::shared_ptr<const Plugin>>>(output,
-                                                             begin(output)),
-      [](const pair<string, std::shared_ptr<const Plugin>>& pluginPair) {
-        return pluginPair.second;
+      begin(plugins_), end(plugins_), begin(output), [](const auto& pair) {
+        return pair.second;
       });
   return output;
 }
@@ -78,17 +73,14 @@ void GameCache::AddPlugin(const Plugin&& plugin) {
   if (it != end(plugins_))
     plugins_.erase(it);
 
-  plugins_.emplace(normalizedName,
-                   std::make_shared<Plugin>(std::move(plugin)));
+  plugins_.emplace(normalizedName, std::make_shared<Plugin>(std::move(plugin)));
 }
 
-std::set<std::filesystem::path> GameCache::GetArchivePaths() const
-{
+std::set<std::filesystem::path> GameCache::GetArchivePaths() const {
   return archivePaths_;
 }
 
-void GameCache::CacheArchivePath(const std::filesystem::path& path)
-{
+void GameCache::CacheArchivePath(const std::filesystem::path& path) {
   lock_guard<mutex> lock(mutex_);
 
   archivePaths_.insert(path);
