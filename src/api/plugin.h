@@ -46,9 +46,6 @@ public:
   virtual size_t GetOverrideRecordCount() const = 0;
   virtual uint32_t GetRecordAndGroupCount() const = 0;
 
-  virtual size_t GetOverlapSize(
-      const std::vector<const PluginInterface*>& plugins) const = 0;
-
   virtual size_t GetAssetCount() const = 0;
   virtual bool DoAssetsOverlap(const PluginSortingInterface& plugin) const = 0;
 };
@@ -60,6 +57,8 @@ public:
                   std::filesystem::path pluginPath,
                   const bool headerOnly);
 
+  void ResolveRecordIds(Vec_PluginMetadata* pluginsMetadata) const;
+
   std::string GetName() const override;
   std::optional<float> GetHeaderVersion() const override;
   std::optional<std::string> GetVersion() const override;
@@ -70,15 +69,15 @@ public:
   bool IsMaster() const override;
 
   bool IsLightPlugin() const override;
-  bool IsOverridePlugin() const override;
+  bool IsMediumPlugin() const override;
+  bool IsUpdatePlugin() const override;
 
   bool IsValidAsLightPlugin() const override;
-  bool IsValidAsOverridePlugin() const override;
+  bool IsValidAsMediumPlugin() const override;
+  bool IsValidAsUpdatePlugin() const override;
   bool IsEmpty() const override;
   bool LoadsArchive() const override;
   bool DoRecordsOverlap(const PluginInterface& plugin) const override;
-  size_t GetOverlapSize(
-      const std::vector<const PluginInterface*>& plugins) const override;
 
   // Load ordering functions.
   size_t GetOverrideRecordCount() const override;
@@ -90,6 +89,11 @@ public:
   // Validity checks.
   static bool IsValid(const GameType gameType,
                       const std::filesystem::path& pluginPath);
+
+  static std::unique_ptr<Vec_PluginMetadata,
+                         decltype(&esp_plugins_metadata_free)>
+      GetPluginsMetadata(
+      std::vector<const Plugin*>);
 
 private:
   void Load(const std::filesystem::path& path,
@@ -103,7 +107,6 @@ private:
   std::unique_ptr<::Plugin, decltype(&esp_plugin_free)> esPlugin;
   bool isEmpty_;  // Does the plugin contain any records other than the TES4
                   // header?
-  size_t overrideRecordCount_;
   std::optional<std::string> version_;  // Obtained from description field.
   std::optional<uint32_t> crc_;
   std::vector<Tag> tags_;

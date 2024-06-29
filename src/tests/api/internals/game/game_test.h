@@ -37,21 +37,34 @@ protected:
   }
 
   void loadInstalledPlugins(Game& game, bool headersOnly) {
-    const std::vector<std::filesystem::path> plugins({
-        // These are all ASCII filenames.
-        masterFile,
-        blankEsm,
-        blankDifferentEsm,
-        blankMasterDependentEsm,
-        blankDifferentMasterDependentEsm,
-        blankEsp,
-        blankDifferentEsp,
-        blankMasterDependentEsp,
-        blankDifferentMasterDependentEsp,
-        blankPluginDependentEsp,
-        blankDifferentPluginDependentEsp,
-    });
-    game.LoadPlugins(plugins, headersOnly);
+    if (GetParam() == GameType::starfield) {
+      const std::vector<std::filesystem::path> plugins({
+          // These are all ASCII filenames.
+          masterFile,
+          blankEsm,
+          blankFullEsm,
+          blankMasterDependentEsm,
+          blankEsp,
+          blankMasterDependentEsp,
+      });
+      game.LoadPlugins(plugins, headersOnly);
+    } else {
+      const std::vector<std::filesystem::path> plugins({
+          // These are all ASCII filenames.
+          masterFile,
+          blankEsm,
+          blankDifferentEsm,
+          blankMasterDependentEsm,
+          blankDifferentMasterDependentEsm,
+          blankEsp,
+          blankDifferentEsp,
+          blankMasterDependentEsp,
+          blankDifferentMasterDependentEsp,
+          blankPluginDependentEsp,
+          blankDifferentPluginDependentEsp,
+      });
+      game.LoadPlugins(plugins, headersOnly);
+    }
   }
 
   const std::string blankArchive;
@@ -166,11 +179,18 @@ TEST_P(GameTest,
   game.LoadCurrentLoadOrderState();
   auto loadOrder = game.GetLoadOrder();
 
+  const auto filename = "plugin.esp";
   const auto dataFilePath =
-      dataPath.parent_path().parent_path() / "Data" / "plugin.esp";
+      dataPath.parent_path().parent_path() / "Data" / filename;
   std::filesystem::create_directories(dataFilePath.parent_path());
   std::filesystem::copy_file(getSourcePluginsPath() / blankEsp, dataFilePath);
   ASSERT_TRUE(std::filesystem::exists(dataFilePath));
+
+  if (GetParam() == GameType::starfield) {
+    std::filesystem::copy_file(getSourcePluginsPath() / blankEsp,
+                               dataPath / filename);
+    ASSERT_TRUE(std::filesystem::exists(dataPath / filename));
+  }
 
   std::filesystem::last_write_time(
       dataFilePath,
@@ -179,7 +199,7 @@ TEST_P(GameTest,
   game.SetAdditionalDataPaths({dataFilePath.parent_path()});
   game.LoadCurrentLoadOrderState();
 
-  loadOrder.push_back("plugin.esp");
+  loadOrder.push_back(filename);
 
   EXPECT_EQ(loadOrder, game.GetLoadOrder());
 }
@@ -208,7 +228,11 @@ TEST_P(
   Game game = Game(GetParam(), dataPath.parent_path(), localPath);
 
   EXPECT_NO_THROW(loadInstalledPlugins(game, true));
-  EXPECT_EQ(11, game.GetCache().GetPlugins().size());
+  if (GetParam() == GameType::starfield) {
+    EXPECT_EQ(6, game.GetCache().GetPlugins().size());
+  } else {
+    EXPECT_EQ(11, game.GetCache().GetPlugins().size());
+  }
 
   // Check that one plugin's header has been read.
   ASSERT_NO_THROW(game.GetPlugin(masterFile));
@@ -252,7 +276,11 @@ TEST_P(GameTest,
   Game game = Game(GetParam(), dataPath.parent_path(), localPath);
 
   EXPECT_NO_THROW(loadInstalledPlugins(game, false));
-  EXPECT_EQ(11, game.GetCache().GetPlugins().size());
+  if (GetParam() == GameType::starfield) {
+    EXPECT_EQ(6, game.GetCache().GetPlugins().size());
+  } else {
+    EXPECT_EQ(11, game.GetCache().GetPlugins().size());
+  }
 
   // Check that one plugin's header has been read.
   ASSERT_NO_THROW(game.GetPlugin(blankEsm));

@@ -73,8 +73,8 @@ if(NOT CMAKE_SYSTEM_NAME STREQUAL "Windows")
 endif()
 
 if(NOT DEFINED ESPLUGIN_URL)
-    set(ESPLUGIN_URL "https://github.com/Ortham/esplugin/archive/5.0.1.tar.gz")
-    set(ESPLUGIN_HASH "SHA256=4feb855e1f90046357497b5f0fdebe3e126f84d8dc9bc468e153bcbcb1aa9171")
+    set(ESPLUGIN_URL "https://github.com/Ortham/esplugin/archive/refs/tags/6.0.0.tar.gz")
+    set(ESPLUGIN_HASH "SHA256=d9deea7581bcd823bcc2ce6903a7c711404b6b80242c47d93f70ec79b9ab59b7")
 endif()
 
 ExternalProject_Add(esplugin
@@ -98,8 +98,8 @@ else()
 endif()
 
 if(NOT DEFINED LIBLOADORDER_URL)
-    set(LIBLOADORDER_URL "https://github.com/Ortham/libloadorder/archive/16.0.0.tar.gz")
-    set(LIBLOADORDER_HASH "SHA256=920d1f1f52b204ef70d726d50c6c7d03ce206b5f28f642aceeb7bad578d0635c")
+    set(LIBLOADORDER_URL "https://github.com/Ortham/libloadorder/archive/refs/tags/17.0.1.tar.gz")
+    set(LIBLOADORDER_HASH "SHA256=36d90eb5cd53cbbf9d04de7ead561d69ea6aadcf3363d425a3c8370dc566c1b6")
 endif()
 
 ExternalProject_Add(libloadorder
@@ -123,8 +123,8 @@ else()
 endif()
 
 if(NOT DEFINED LOOT_CONDITION_INTERPRETER_URL)
-    set(LOOT_CONDITION_INTERPRETER_URL "https://github.com/loot/loot-condition-interpreter/archive/4.0.0.tar.gz")
-    set(LOOT_CONDITION_INTERPRETER_HASH "SHA256=8ed76a1393bd4a909a39d560444ac9186b795a56929d8b07ff77e4aef1e54adc")
+    set(LOOT_CONDITION_INTERPRETER_URL "https://github.com/loot/loot-condition-interpreter/archive/refs/tags/4.0.1.tar.gz")
+    set(LOOT_CONDITION_INTERPRETER_HASH "SHA256=12bf0b108e4734baa3634e98cd7952a9411352539be3ec270aeee97c1b8db92f")
 endif()
 
 ExternalProject_Add(loot-condition-interpreter
@@ -403,7 +403,7 @@ endif()
 # Install
 ########################################
 
-set(LIBLOOT_VERSION "0.22.4")
+set(LIBLOOT_VERSION "0.23.0")
 
 set_property(TARGET loot PROPERTY VERSION ${LIBLOOT_VERSION})
 set_property(TARGET loot PROPERTY SOVERSION 0)
